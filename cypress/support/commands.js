@@ -1,17 +1,30 @@
 // ---------------------- function fielField -------------------------
 Cypress.Commands.add('fillField', (selector, value) => {
-    cy.get(selector).clear().type(value);
+    cy.get(selector)
+      .should('be.visible')
+      .as('inputField');
+  
+    cy.get('@inputField').invoke('val', ''); 
+    cy.get('@inputField').type(value, { force: true }); 
   });
 
-    // cy.fillField(FIRST_NAME, formData.firstName);
+// Cypress.Commands.add('fillField', (selector, value) => {
+//     cy.get(selector).clear().type(value);
+//   });
+
 
 // ----------------------- popUP CLOSE --------------------------------
 Cypress.Commands.add('popUpVoucherClosed', () => {
-    cy.get('div.mlctr-popup', { timeout: 10000 }) // Čaká max 10 sekúnd, kým sa pop-up objaví
-      .should('be.visible')
-      .then(() => {
-        cy.get('div.mlctr-popup > div.mlctr-close-button').click({ force: true });
-      });
+  cy.document().then((document) => {
+      new MutationObserver(function () {
+          const popUpSelector = 'div.mlctr-popup';
+          if (document.querySelector(popUpSelector)) {
+              cy.get(popUpSelector + ' > div.mlctr-close-button').click({
+                  multiple: true,
+                  force: true,
+              });
+          }
+      }).observe(document.body, { childList: true, subtree: true });
   });
-
+});
     //   cy.popUpVoucherClosed();
